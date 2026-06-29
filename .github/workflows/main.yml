@@ -1,29 +1,33 @@
-on:
-  push:
-    branches:
-      - main
+# File: .github/workflows/workflow.yml
 
-permissions:
-  id-token: write
-  contents: read
+on: [push]
+
+name: Run Azure Login without subscription
 
 jobs:
-  job1:
-    name: Azure Login Test
-    runs-on: ubuntu-22.04
 
+  build-and-deploy:
+    runs-on: ubuntu-latest
     steps:
-      - name: Azure Login
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          allow-no-subscriptions: true
-          enable-AzPSSession: true
-      - name: Azure CLI Script
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az account show
+
+    - name: Azure Login
+      uses: azure/login@v3
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        allow-no-subscriptions: true
+        enable-AzPSSession: true
+
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az account show
+
+    - name: Run Azure PowerShell
+      uses: azure/powershell@v3
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Get-AzContext
